@@ -34,3 +34,12 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+
+Develop/Tour/[Ll]ibrary/
+Develop/Tour/[Tt]emp/
+Develop/Tour/[Oo]bj/
+Develop/Tour/[Bb]uild/
+Develop/Tour/[Bb]uilds/
+
+Develop/Tour/.vs
+Develop/Tour/.idea
