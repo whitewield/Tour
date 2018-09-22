@@ -4,9 +4,26 @@ using UnityEngine;
 
 public class CS_PlayerControl : MonoBehaviour {
 
-	[SerializeField] float mySpeed = 2;
+	private static CS_PlayerControl instance = null;
+	public static CS_PlayerControl Instance {get {return instance;}}
 
-	// Use this for initialization
+	private Rigidbody myRigidbody;
+
+	[SerializeField] float myAcceleration = 10;
+	[SerializeField] float myFrictionRatio = 0.9f;
+	private Vector3 myDirection = Vector3.zero;
+
+	private void Awake () {
+		if (instance != null && instance != this) {
+			Destroy (this.gameObject);
+			return;
+		} else {
+			instance = this;
+		}
+
+		myRigidbody = this.GetComponent<Rigidbody> ();
+	}
+
 	void Start () {
 		if (Application.platform == RuntimePlatform.IPhonePlayer) {
 			Input.multiTouchEnabled = true;
@@ -28,40 +45,56 @@ public class CS_PlayerControl : MonoBehaviour {
 				// get average
 				for (int i = 0; i < t_touches.Length; i++) {
 					t_touchCenter += t_touches[i].position;
-					Debug.Log ("t_touches:" + i + " " + t_touchCenter);
 				}
 				t_touchCenter /= t_touches.Length;
 
-				Debug.Log ("t_touchCenter:" + t_touchCenter);
-
-				ScreenPointMove (t_touchCenter);
+				myDirection = ScreenPointToDirection (t_touchCenter);
 			}
 		} else if (Input.GetMouseButton (0)) {
 			//Debug.Log ("Mouse");
-			ScreenPointMove (Input.mousePosition);
+			myDirection = ScreenPointToDirection (Input.mousePosition);
+		} else {
+			myDirection = Vector3.zero;
 		}
 	}
 
-	private void ScreenPointMove (Vector2 g_screenPoint) {
+	private void FixedUpdate () {
+		// get current velocity
+		Vector3 t_currentVelocity = myRigidbody.velocity;
 
-		//Debug.Log ("Screen:" + g_screenPoint);
+		// apply acceleration
+		t_currentVelocity += myDirection * myAcceleration * Time.fixedDeltaTime;
+
+		// apply friction
+		t_currentVelocity = t_currentVelocity * myFrictionRatio;
+
+		// set velocity
+		myRigidbody.velocity = t_currentVelocity;
+	}
+
+	private Vector3 ScreenPointToDirection (Vector2 g_screenPoint) {
 
 		// get the target world position
-		Vector3 t_targetPosition =
+		Vector3 t_pointOnLine =
 			Camera.main.ScreenToWorldPoint (new Vector3 (g_screenPoint.x, g_screenPoint.y, Camera.main.farClipPlane));
 
-		//Debug.Log ("ScreenToWorld:" + t_targetPosition);
+		Vector3 t_targetPosition = 
+			GetIntersectWithLineAndPlane (t_pointOnLine, Camera.main.transform.forward, Vector3.up, Vector3.zero);
 
-		t_targetPosition = Vector3.ProjectOnPlane (t_targetPosition - Camera.main.transform.position, Camera.main.transform.forward);
-		t_targetPosition = Vector3.ProjectOnPlane (t_targetPosition, Vector3.up);
+		//t_targetPosition = Vector3.ProjectOnPlane (t_targetPosition - Camera.main.transform.position, Camera.main.transform.forward);
+		//t_targetPosition = Vector3.ProjectOnPlane (t_targetPosition, Vector3.up);
 
-		//Debug.Log ("World:" + t_targetPosition);
+		t_targetPosition = t_targetPosition - this.transform.position;
 
-		//Debug.Log ("Nor:" + t_targetPosition.normalized);
-
-		// move the player
-		if (!Mathf.Approximately (t_targetPosition.sqrMagnitude, 0)) {
-			this.transform.position = this.transform.position + t_targetPosition.normalized * mySpeed * Time.deltaTime;
+		if (Mathf.Approximately (t_targetPosition.sqrMagnitude, 0)) {
+			return Vector3.zero;
+		} else {
+			return t_targetPosition.normalized;
 		}
+	}
+
+	public static Vector3 GetIntersectWithLineAndPlane (Vector3 linePoint, Vector3 lineDirection, Vector3 planeNormal, Vector3 planePoint) {
+		float d = Vector3.Dot (planePoint - linePoint, planeNormal) / Vector3.Dot (lineDirection, planeNormal);
+		return d * lineDirection + linePoint;
 	}
 }
