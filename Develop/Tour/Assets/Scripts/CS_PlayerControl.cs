@@ -21,6 +21,11 @@ public class CS_PlayerControl : MonoBehaviour {
 	private Vector3 myDirection = Vector3.zero;
 	public Vector3 MyDirection { get { return myDirection; } }
 
+	[SerializeField] Transform myDirectionDisplay;
+	private float myDirectionDisplay_Scale = 0;
+	[SerializeField] float myDirectionDisplay_MaxScale = 1;
+	[SerializeField] float myDirectionDisplay_LerpSpeed = 1;
+
 	private void Awake () {
 		if (instance != null && instance != this) {
 			Destroy (this.gameObject);
@@ -45,6 +50,11 @@ public class CS_PlayerControl : MonoBehaviour {
 	}
 
 	void Update () {
+		Update_Direction ();
+		Update_DirectionDisplay ();
+	}
+
+	private void Update_Direction () {
 		if (Application.platform == RuntimePlatform.IPhonePlayer) {
 			// if its on iphone, use multi-touch calculation
 
@@ -71,6 +81,25 @@ public class CS_PlayerControl : MonoBehaviour {
 			// otherwise, set direction to zero
 			myDirection = Vector3.zero;
 		}
+	}
+
+	private void Update_DirectionDisplay () {
+		if (myDirection == Vector3.zero) {
+			// lerp the scale to 0
+			myDirectionDisplay_Scale = 
+				Mathf.Lerp (myDirectionDisplay_Scale, 0, Time.deltaTime * myDirectionDisplay_LerpSpeed);
+		} else {
+			// set the forward direction of the display
+			myDirectionDisplay.forward = myDirection;
+			// lerp the scale to 1
+			myDirectionDisplay_Scale = Mathf.Lerp (
+					myDirectionDisplay_Scale,
+					myDirectionDisplay_MaxScale,
+					Time.deltaTime * myDirectionDisplay_LerpSpeed
+			);
+		}
+		// apply the scale to display transform
+		myDirectionDisplay.localScale = Vector3.one * myDirectionDisplay_Scale;
 	}
 
 	private void FixedUpdate () {

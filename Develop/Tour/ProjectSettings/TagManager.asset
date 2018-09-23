@@ -41,3 +41,18 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: BackGround
+    uniqueID: 2172451729
+    locked: 0
+  - name: DownEffects
+    uniqueID: 3369829129
+    locked: 0
+  - name: Player
+    uniqueID: 1866734659
+    locked: 0
+  - name: UpEffects
+    uniqueID: 3318127381
+    locked: 0
+  - name: Transform
+    uniqueID: 4147520975
+    locked: 0
