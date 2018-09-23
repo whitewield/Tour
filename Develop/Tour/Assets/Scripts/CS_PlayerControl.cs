@@ -9,12 +9,15 @@ public class CS_PlayerControl : MonoBehaviour {
 
 	private Rigidbody myRigidbody;
 
+	// store my camera
 	private Camera myCamera;
 	private CS_Camera myCameraScript;
 
+	// for movement
 	[SerializeField] float myAcceleration = 10;
 	[SerializeField] float myFrictionRatio = 0.9f;
 
+	// my moving direction
 	private Vector3 myDirection = Vector3.zero;
 	public Vector3 MyDirection { get { return myDirection; } }
 
@@ -26,22 +29,24 @@ public class CS_PlayerControl : MonoBehaviour {
 			instance = this;
 		}
 
+		// find my rigidBody
 		myRigidbody = this.GetComponent<Rigidbody> ();
 	}
 
 	void Start () {
+		// enable multi-touch
 		if (Application.platform == RuntimePlatform.IPhonePlayer) {
 			Input.multiTouchEnabled = true;
 		}
 
+		// find my camera
 		myCameraScript = CS_Camera.Instance;
 		myCamera = myCameraScript.GetComponent<Camera> ();
 	}
 
 	void Update () {
-
 		if (Application.platform == RuntimePlatform.IPhonePlayer) {
-			//Debug.Log ("IPhonePlayer");
+			// if its on iphone, use multi-touch calculation
 
 			// get the touches
 			Touch[] t_touches = Input.touches;
@@ -56,12 +61,14 @@ public class CS_PlayerControl : MonoBehaviour {
 				}
 				t_touchCenter /= t_touches.Length;
 
+				// set direction
 				myDirection = ScreenPointToDirection (t_touchCenter);
 			}
 		} else if (Input.GetMouseButton (0)) {
-			//Debug.Log ("Mouse");
+			// if its using a mouse, do mouse calculation
 			myDirection = ScreenPointToDirection (Input.mousePosition);
 		} else {
+			// otherwise, set direction to zero
 			myDirection = Vector3.zero;
 		}
 	}
@@ -81,18 +88,18 @@ public class CS_PlayerControl : MonoBehaviour {
 	}
 
 	private Vector3 ScreenPointToDirection (Vector2 g_screenPoint) {
-
 		// get a point on the ray
 		Vector3 t_pointOnLine =
 			myCamera.ScreenToWorldPoint (new Vector3 (g_screenPoint.x, g_screenPoint.y, myCamera.farClipPlane));
 
 		// get the target world position
 		Vector3 t_targetPosition = 
-			GetIntersectWithLineAndPlane (t_pointOnLine, myCamera.transform.forward, Vector3.up, Vector3.zero);
+			LinePlaneIntersection (t_pointOnLine, myCamera.transform.forward, Vector3.up, Vector3.zero);
 
 		// calculate the direction
 		t_targetPosition = t_targetPosition - this.transform.position;
 
+		// if the direction is longer than zero, normalize
 		if (Mathf.Approximately (t_targetPosition.sqrMagnitude, 0)) {
 			return Vector3.zero;
 		} else {
@@ -100,7 +107,16 @@ public class CS_PlayerControl : MonoBehaviour {
 		}
 	}
 
-	public static Vector3 GetIntersectWithLineAndPlane (Vector3 linePoint, Vector3 lineDirection, Vector3 planeNormal, Vector3 planePoint) {
+	/// <summary>
+	/// Gets the intersection point with line and plane.
+	/// reference: https://en.wikipedia.org/wiki/Line%E2%80%93plane_intersection
+	/// </summary>
+	/// <returns>The intersection point</returns>
+	/// <param name="linePoint">a point on the line.</param>
+	/// <param name="lineDirection">line direction.</param>
+	/// <param name="planeNormal">plane's normal.</param>
+	/// <param name="planePoint">a point on the plane.</param>
+	public static Vector3 LinePlaneIntersection (Vector3 linePoint, Vector3 lineDirection, Vector3 planeNormal, Vector3 planePoint) {
 		float d = Vector3.Dot (planePoint - linePoint, planeNormal) / Vector3.Dot (lineDirection, planeNormal);
 		return d * lineDirection + linePoint;
 	}
