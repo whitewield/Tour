@@ -5,13 +5,18 @@ using UnityEngine;
 public class CS_PlayerControl : MonoBehaviour {
 
 	private static CS_PlayerControl instance = null;
-	public static CS_PlayerControl Instance {get {return instance;}}
+	public static CS_PlayerControl Instance { get { return instance; } }
 
 	private Rigidbody myRigidbody;
 
+	private Camera myCamera;
+	private CS_Camera myCameraScript;
+
 	[SerializeField] float myAcceleration = 10;
 	[SerializeField] float myFrictionRatio = 0.9f;
+
 	private Vector3 myDirection = Vector3.zero;
+	public Vector3 MyDirection { get { return myDirection; } }
 
 	private void Awake () {
 		if (instance != null && instance != this) {
@@ -28,6 +33,9 @@ public class CS_PlayerControl : MonoBehaviour {
 		if (Application.platform == RuntimePlatform.IPhonePlayer) {
 			Input.multiTouchEnabled = true;
 		}
+
+		myCameraScript = CS_Camera.Instance;
+		myCamera = myCameraScript.GetComponent<Camera> ();
 	}
 
 	void Update () {
@@ -74,16 +82,15 @@ public class CS_PlayerControl : MonoBehaviour {
 
 	private Vector3 ScreenPointToDirection (Vector2 g_screenPoint) {
 
-		// get the target world position
+		// get a point on the ray
 		Vector3 t_pointOnLine =
-			Camera.main.ScreenToWorldPoint (new Vector3 (g_screenPoint.x, g_screenPoint.y, Camera.main.farClipPlane));
+			myCamera.ScreenToWorldPoint (new Vector3 (g_screenPoint.x, g_screenPoint.y, myCamera.farClipPlane));
 
+		// get the target world position
 		Vector3 t_targetPosition = 
-			GetIntersectWithLineAndPlane (t_pointOnLine, Camera.main.transform.forward, Vector3.up, Vector3.zero);
+			GetIntersectWithLineAndPlane (t_pointOnLine, myCamera.transform.forward, Vector3.up, Vector3.zero);
 
-		//t_targetPosition = Vector3.ProjectOnPlane (t_targetPosition - Camera.main.transform.position, Camera.main.transform.forward);
-		//t_targetPosition = Vector3.ProjectOnPlane (t_targetPosition, Vector3.up);
-
+		// calculate the direction
 		t_targetPosition = t_targetPosition - this.transform.position;
 
 		if (Mathf.Approximately (t_targetPosition.sqrMagnitude, 0)) {
