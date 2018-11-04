@@ -216,8 +216,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1871314374243022}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0.5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: -0, z: 1.2}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children: []
   m_Father: {fileID: 4194766099665080}
   m_RootOrder: 0
@@ -271,7 +271,7 @@ TrailRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -925138167
-  m_SortingLayer: 2
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Time: 10
   m_Parameters:
@@ -351,7 +351,7 @@ MonoBehaviour:
   myAcceleration: 54
   myFrictionRatio: 0.9
   myDirectionDisplay: {fileID: 4194766099665080}
-  myDirectionDisplay_MaxScale: 0.9
+  myDirectionDisplay_MaxScale: 1
   myDirectionDisplay_LerpSpeed: 9
 --- !u!135 &135332709113376006
 SphereCollider:
@@ -4931,7 +4931,7 @@ ParticleSystemRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -925138167
-  m_SortingLayer: 2
+  m_SortingLayer: 1
   m_SortingOrder: -10
   m_RenderMode: 2
   m_SortMode: 0
@@ -4985,7 +4985,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -925138167
-  m_SortingLayer: 2
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: fe45df203c3634dc7b69725e7aaa02a8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 0.5019608}
@@ -5030,7 +5030,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1866734659
-  m_SortingLayer: 3
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: b587ce4397cc64e90b44a037c783646a, type: 3}
   m_Color: {r: 0.8235294, g: 0.8980392, b: 0.8980392, a: 1}
